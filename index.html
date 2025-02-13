@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><i>Student Management System</i></title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            body {
+                background-image: url('https://img.freepik.com/free-photo/dark-room-with-light-background_1409-1809.jpg?semt=ais_hybrid');
+                background-size: 100%;
+                background-position: center;
+                background-attachment: fixed;
+                font-family: Arial, sans-serif;
+            }
+            
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .result-table {
+            margin-top: 20px;
+        }
+
+        .alert-message {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 class="text-center my-4">Student Management System</h1>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Add Student</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="studentForm">
+                            <div class="mb-3">
+                                <label for="studentId" class="form-label">Student ID</label>
+                                <input type="text" class="form-control" id="studentId" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentName" class="form-label">Student Name</label>
+                                <input type="text" class="form-control" id="studentName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentAge" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="studentAge" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="studentGrade" class="form-label">Grade</label>
+                                <input type="text" class="form-control" id="studentGrade" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Add Student</button>
+                        </form>
+                        <div id="alertMessage" class="alert alert-success alert-message" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4>All Students</h4>
+                    </div>
+                    <div class="card-body">
+                        <button id="viewStudentsBtn" class="btn btn-primary w-100">View All Students</button>
+                        <div id="studentList" class="result-table"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit and Delete Modal -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalLabel">Edit Student Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editStudentName" class="form-label">Student Name</label>
+                        <input type="text" class="form-control" id="editStudentName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStudentAge" class="form-label">Age</label>
+                        <input type="number" class="form-control" id="editStudentAge">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStudentGrade" class="form-label">Grade</label>
+                        <input type="text" class="form-control" id="editStudentGrade">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveStudentBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const students = {}; // Store students data
+        const studentIds = []; // Track student IDs
+
+        // Add student record
+        document.getElementById('studentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const studentId = document.getElementById('studentId').value;
+            const name = document.getElementById('studentName').value;
+            const age = document.getElementById('studentAge').value;
+            const grade = document.getElementById('studentGrade').value;
+
+            students[studentId] = { name, age, grade };
+            studentIds.push(studentId);
+
+            document.getElementById('alertMessage').textContent = "Student added successfully!";
+            document.getElementById('alertMessage').style.display = "block";
+
+            // Reset the form
+            document.getElementById('studentForm').reset();
+        });
+
+        // View all students
+        document.getElementById('viewStudentsBtn').addEventListener('click', function () {
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = ''; // Clear existing list
+            if (studentIds.length === 0) {
+                studentList.innerHTML = '<p>No students found.</p>';
+                return;
+            }
+
+            studentIds.forEach(studentId => {
+                const student = students[studentId];
+                const studentDiv = document.createElement('div');
+                studentDiv.classList.add('d-flex', 'justify-content-between', 'border', 'p-2', 'mb-2');
+                studentDiv.innerHTML = `
+                    <div>
+                        <strong>${studentId}</strong>: ${student.name} (Age: ${student.age}, Grade: ${student.grade})
+                    </div>
+                    <div>
+                        <button class="btn btn-warning btn-sm me-2" onclick="editStudent('${studentId}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteStudent('${studentId}')">Delete</button>
+                    </div>
+                `;
+                studentList.appendChild(studentDiv);
+            });
+        });
+
+        // Edit student information
+        function editStudent(studentId) {
+            const student = students[studentId];
+            document.getElementById('editStudentName').value = student.name;
+            document.getElementById('editStudentAge').value = student.age;
+            document.getElementById('editStudentGrade').value = student.grade;
+
+            document.getElementById('saveStudentBtn').onclick = function () {
+                const name = document.getElementById('editStudentName').value;
+                const age = document.getElementById('editStudentAge').value;
+                const grade = document.getElementById('editStudentGrade').value;
+                students[studentId] = { name, age, grade };
+                alert("Student information updated!");
+                document.getElementById('editStudentModal').modal('hide');
+            };
+
+            const editModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+            editModal.show();
+        }
+
+        // Delete student record
+        function deleteStudent(studentId) {
+            delete students[studentId];
+            const index = studentIds.indexOf(studentId);
+            if (index > -1) {
+                studentIds.splice(index, 1);
+            }
+            alert("Student record deleted!");
+            document.getElementById('viewStudentsBtn').click(); // Refresh the student list
+        }
+    </script>
+</body>
+
+</html>
